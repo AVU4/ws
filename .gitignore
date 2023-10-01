@@ -3,3 +3,12 @@
 /lab1/standalone/target/
 /lab1/standalone-client/target/
 /ws.iml
+/lab1/standalone-web/.mvn/
+/lab1/standalone-web/HELP.md
+/lab1/standalone-web/mvnw
+/lab1/standalone-web/mvnw.cmd
+/lab1/standalone-web/standalone-web.iml
+/lab1/standalone-web/target/
+/lab1/target/
+/lab1/standalone-webapp/target/
+/standalone-web.iml

@@ -12,6 +12,7 @@
   <modules>
     <module>standalone</module>
     <module>standalone-client</module>
+    <module>webapp</module>
   </modules>
 
   <properties>

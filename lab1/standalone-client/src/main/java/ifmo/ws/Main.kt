@@ -7,6 +7,7 @@ import java.net.URL
 fun main(args: Array<String>) {
     val characterWebService = CharacterService(
         URL("http://localhost:8080/CharacterService?wsdl")
+//        URL("http://localhost:8080/standalone-webapp/ws/service?wsdl") this to test webapp
     )
 
     println("Request characters")
