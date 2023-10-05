@@ -12,3 +12,7 @@
 /lab1/target/
 /lab1/standalone-webapp/target/
 /standalone-web.iml
+/lab2/standalone-client-2/src/main/java/ifmo/ws/generated/
+/lab1/webapp/target/
+/lab2/standalone-2/target/
+/lab2/standalone-client-2/target/
