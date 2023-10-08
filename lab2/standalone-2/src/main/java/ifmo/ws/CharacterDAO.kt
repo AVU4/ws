@@ -95,13 +95,18 @@ class CharacterDAO(private val databaseConnection: DatabaseConnection) {
     }
 
     private fun executeInsertSQLQuery(args: Map<String, Any>): Long {
-        val connection = databaseConnection.getConnection()
-        val statement = connection?.prepareStatement(INSERT_SQL_QUERY, PreparedStatement.RETURN_GENERATED_KEYS)
-        statement?.setObject(1, args["name"])
-        statement?.setObject(2, args["race"])
-        statement?.setObject(3, args["rank"])
-        statement?.setObject(4, args["home_world"])
-        statement?.executeUpdate()
+        var statement: PreparedStatement? = null
+        try {
+            val connection = databaseConnection.getConnection()
+            statement = connection?.prepareStatement(INSERT_SQL_QUERY, PreparedStatement.RETURN_GENERATED_KEYS)
+            statement?.setObject(1, args["name"])
+            statement?.setObject(2, args["race"])
+            statement?.setObject(3, args["rank"])
+            statement?.setObject(4, args["home_world"])
+            statement?.executeUpdate()
+        } catch (e: SQLException) {
+            Logger.getAnonymousLogger().log(Level.SEVERE, null, e)
+        }
 
         val resultSet = statement?.generatedKeys
         return if (resultSet != null && resultSet.next()) {
