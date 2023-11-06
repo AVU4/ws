@@ -18,48 +18,21 @@ class CharacterDAO(private val databaseConnection: DatabaseConnection) {
         if (args.isEmpty()) {
             executeSelectSQLQuery(characters)
         } else {
-            if (checkTheArgsToNPE(args)) {
-                executeSelectSQLQueryWithArgs(characters, args)
-            } else {
-                throw ServiceException(MessageConstants.NULL_ARGUMENT_EXCEPTION, CharacterServiceFault(MessageConstants.NULL_ARGUMENT_EXCEPTION))
-            }
-
+            executeSelectSQLQueryWithArgs(characters, args)
         }
         return characters
     }
 
     fun createCharacter(args: Map<String, Any?>): Long {
-        if (!checkTheArgsToNPE(args)) {
-            throw ServiceException(MessageConstants.NULL_ARGUMENT_EXCEPTION, CharacterServiceFault(MessageConstants.NULL_ARGUMENT_EXCEPTION))
-        }
-        if (isFullArgs(args)) {
-            return executeInsertSQLQuery(args)
-        }
-        throw ServiceException(MessageConstants.NOT_FULL_PARAMETERS_TO_INSERT, CharacterServiceFault(MessageConstants.NOT_FULL_PARAMETERS_TO_INSERT))
+        return executeInsertSQLQuery(args)
     }
 
-    fun removeCharacter(id: Long?): Boolean {
-        if (id == null) {
-            throw ServiceException(MessageConstants.INCORRECT_ID, CharacterServiceFault(MessageConstants.INCORRECT_ID))
-        }
+    fun removeCharacter(id: Long): Boolean {
         return executeRemoveSQLQuery(id)
     }
 
-    fun updateCharacter(id: Long?, args: Map<String, Any?>): Boolean {
-        if (id == null) {
-            throw ServiceException(MessageConstants.INCORRECT_ID, CharacterServiceFault(MessageConstants.INCORRECT_ID))
-        }
-        if (!checkTheArgsToNPE(args)) {
-            throw ServiceException(MessageConstants.NULL_ARGUMENT_EXCEPTION, CharacterServiceFault(MessageConstants.NULL_ARGUMENT_EXCEPTION))
-        }
-        val isNotEmptyArgs = args.isNotEmpty()
-        val isCanModified = isModifiedArgs(args)
-        if (isNotEmptyArgs && isCanModified) {
-            return executeUpdateSQLQuery(id, args)
-        } else if (isNotEmptyArgs) {
-            throw ServiceException(MessageConstants.NOT_INCORRECT_FIELD_TO_UPDATE, CharacterServiceFault(MessageConstants.NOT_INCORRECT_FIELD_TO_UPDATE))
-        }
-        throw ServiceException(MessageConstants.MISSED_FIELDS_TO_UPDATE, CharacterServiceFault(MessageConstants.MISSED_FIELDS_TO_UPDATE))
+    fun updateCharacter(id: Long, args: Map<String, Any?>): Boolean {
+        return executeUpdateSQLQuery(id, args)
     }
 
     private fun executeUpdateSQLQuery(id: Long, args: Map<String, Any?>): Boolean {
@@ -96,10 +69,6 @@ class CharacterDAO(private val databaseConnection: DatabaseConnection) {
         return true
     }
 
-    private fun isModifiedArgs(args: Map<String, Any?>): Boolean {
-        return !args.containsKey("id") && !args.containsKey("name")
-    }
-
     private fun executeRemoveSQLQuery(id: Long): Boolean {
         var rowsDeleted: Int? = null
         try {
@@ -116,10 +85,6 @@ class CharacterDAO(private val databaseConnection: DatabaseConnection) {
             throw ServiceException(MessageConstants.TRY_TO_REMOVE_NOT_EXISTED_ENTITY, CharacterServiceFault(MessageConstants.TRY_TO_REMOVE_NOT_EXISTED_ENTITY))
         }
         return true
-    }
-
-    private fun isFullArgs(args: Map<String, Any?>): Boolean {
-        return args.containsKey("name") && args.containsKey("race") && args.containsKey("rank") && args.containsKey("home_world")
     }
 
     private fun executeInsertSQLQuery(args: Map<String, Any?>): Long {
@@ -143,10 +108,6 @@ class CharacterDAO(private val databaseConnection: DatabaseConnection) {
         } else {
             -1
         }
-    }
-
-    private fun checkTheArgsToNPE(args: Map<String, Any?>) : Boolean {
-        return args.values.filterNotNull().size == args.size
     }
 
     private fun executeSelectSQLQueryWithArgs(characters: ArrayList<Character>, args: Map<String, Any?>) {

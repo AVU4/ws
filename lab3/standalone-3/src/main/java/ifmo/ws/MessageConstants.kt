@@ -11,6 +11,7 @@ class MessageConstants {
         const val TRY_TO_REMOVE_NOT_EXISTED_ENTITY = "The request try to remove not existed entity"
         const val INCORRECT_ID = "The id mustn't be null"
         const val SQL_EXCEPTION = "The exception is thrown when sql query is executing"
+        const val THROTTLING_EXCEPTION = "The limit of requests is exceeded"
     }
 
 }

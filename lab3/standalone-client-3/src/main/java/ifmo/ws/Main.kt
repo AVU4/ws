@@ -2,10 +2,20 @@ package ifmo.ws
 
 import ifmo.ws.generated.*
 import java.net.URL
+import java.util.concurrent.Executors
 
 fun main(args: Array<String>) {
+    val THREADS_COUNT = 4
+    val executors = Executors.newFixedThreadPool(THREADS_COUNT)
+    for (i in 0..THREADS_COUNT) {
+        executors.execute() { -> job() }
+    }
+    executors.shutdown()
+}
+
+fun job() {
     val characterWebService = CharacterService(
-        URL("http://localhost:8080/CharacterService?wsdl")
+            URL("http://localhost:8080/CharacterService?wsdl")
 //        URL("http://localhost:8080/standalone-webapp/ws/service?wsdl") this to test webapp
     )
 
@@ -13,7 +23,7 @@ fun main(args: Array<String>) {
     println("Request characters")
     try {
         characterWebService.characterWebServicePort.getCharacters(GetCharacters.Arg0())
-            .forEach {character -> println(character.name) }
+                .forEach {character -> println(character.name) }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -33,12 +43,12 @@ fun main(args: Array<String>) {
     println("Request characters by name")
     try {
         characterWebService.characterWebServicePort.getCharacters(selectByName)
-            .forEach { character ->
-                run {
-                    subZeroId = character.id
-                    println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}")
+                .forEach { character ->
+                    run {
+                        subZeroId = character.id
+                        println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}")
+                    }
                 }
-            }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -71,7 +81,7 @@ fun main(args: Array<String>) {
     println("Request characters by race and home world")
     try {
         characterWebService.characterWebServicePort.getCharacters(selectByRaceAndHomeWorld)
-            .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
+                .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -130,7 +140,7 @@ fun main(args: Array<String>) {
     println("After first request to update")
     try {
         characterWebService.characterWebServicePort.getCharacters(selectByName)
-            .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
+                .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -161,7 +171,7 @@ fun main(args: Array<String>) {
     println("After second request to update")
     try {
         characterWebService.characterWebServicePort.getCharacters(selectByName)
-            .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
+                .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -238,5 +248,4 @@ fun main(args: Array<String>) {
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
-
 }
