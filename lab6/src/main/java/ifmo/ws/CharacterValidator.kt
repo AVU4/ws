@@ -7,7 +7,7 @@ class CharacterValidator {
         }
 
         fun isFullArgs(args: Map<String, Any?>): Boolean {
-            return args.containsKey("name") && args.containsKey("race") && args.containsKey("rank") && args.containsKey("home_world")
+            return args.containsKey("name") && args.containsKey("race") && args.containsKey("rank") && args.containsKey("homeWorld")
         }
 
         fun isModifiedArgs(args: Map<String, Any?>): Boolean {

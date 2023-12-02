@@ -1,8 +1,11 @@
 package ifmo.ws
 
 import ifmo.ws.generated.*
+import java.net.Authenticator
+import java.net.PasswordAuthentication
 import java.net.URL
 import java.util.concurrent.Executors
+import javax.xml.ws.BindingProvider
 
 fun main(args: Array<String>) {
     val THREADS_COUNT = 4
@@ -14,15 +17,28 @@ fun main(args: Array<String>) {
 }
 
 fun job() {
-    val characterWebService = CharacterService(
+
+    val authenticator = Authenticator.setDefault(object : Authenticator() {
+        override fun getPasswordAuthentication(): PasswordAuthentication {
+            return PasswordAuthentication("user", "password".toCharArray())
+        }
+    })
+
+    val characterService = CharacterService(
             URL("http://localhost:8080/CharacterService?wsdl")
 //        URL("http://localhost:8080/standalone-webapp/ws/service?wsdl") this to test webapp
     )
 
+    val characterWebService = characterService.characterWebServicePort
+
+    val bindingProvider = characterWebService as BindingProvider
+    bindingProvider.requestContext[BindingProvider.USERNAME_PROPERTY] = "user"
+    bindingProvider.requestContext[BindingProvider.PASSWORD_PROPERTY] = "password"
+
     // Select all characters
     println("Request characters")
     try {
-        characterWebService.characterWebServicePort.getCharacters(GetCharacters.Arg0())
+        characterWebService.getCharacters(GetCharacters.Arg0())
                 .forEach {character -> println(character.name) }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
@@ -42,7 +58,7 @@ fun job() {
 
     println("Request characters by name")
     try {
-        characterWebService.characterWebServicePort.getCharacters(selectByName)
+        characterWebService.getCharacters(selectByName)
                 .forEach { character ->
                     run {
                         subZeroId = character.id
@@ -80,7 +96,7 @@ fun job() {
 
     println("Request characters by race and home world")
     try {
-        characterWebService.characterWebServicePort.getCharacters(selectByRaceAndHomeWorld)
+        characterWebService.getCharacters(selectByRaceAndHomeWorld)
                 .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
@@ -112,7 +128,7 @@ fun job() {
 
     var scorpionId: Long? = null
     try {
-        scorpionId = characterWebService.characterWebServicePort.createCharacter(scorpion)
+        scorpionId = characterWebService.createCharacter(scorpion)
         println("The id of created entity -- $scorpionId")
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
@@ -129,7 +145,7 @@ fun job() {
 
     scorpionUpdateFirst.entry.add(raceUpdate)
     try {
-        characterWebService.characterWebServicePort.updateCharacter(scorpionId, scorpionUpdateFirst)
+        characterWebService.updateCharacter(scorpionId, scorpionUpdateFirst)
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -139,7 +155,7 @@ fun job() {
     // Select Scorpion with new state
     println("After first request to update")
     try {
-        characterWebService.characterWebServicePort.getCharacters(selectByName)
+        characterWebService.getCharacters(selectByName)
                 .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
@@ -160,7 +176,7 @@ fun job() {
     scorpionUpdateSecond.entry.add(rankUpdate)
 
     try {
-        characterWebService.characterWebServicePort.updateCharacter(scorpionId, scorpionUpdateSecond)
+        characterWebService.updateCharacter(scorpionId, scorpionUpdateSecond)
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -170,7 +186,7 @@ fun job() {
     // Select Scorpion with new state
     println("After second request to update")
     try {
-        characterWebService.characterWebServicePort.getCharacters(selectByName)
+        characterWebService.getCharacters(selectByName)
                 .forEach { character ->  println("Got character - ${character.name} ${character.race} ${character.homeWorld} ${character.rank}") }
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
@@ -178,7 +194,7 @@ fun job() {
 
     // Remove new character
     try {
-        val isRemoved = characterWebService.characterWebServicePort.removeCharacter(scorpionId)
+        val isRemoved = characterWebService.removeCharacter(scorpionId)
         println("The entity ${if (isRemoved) "was" else "wasn't"} removed")
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
@@ -195,7 +211,7 @@ fun job() {
     notKnownCharacterUpdate.entry.add(notKnownCharacterRankUpdate)
 
     try {
-        characterWebService.characterWebServicePort.updateCharacter(123, notKnownCharacterUpdate)
+        characterWebService.updateCharacter(123, notKnownCharacterUpdate)
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -209,7 +225,7 @@ fun job() {
     subZeroUpdate.entry.add(idUpdate)
 
     try {
-        characterWebService.characterWebServicePort.updateCharacter(subZeroId, subZeroUpdate)
+        characterWebService.updateCharacter(subZeroId, subZeroUpdate)
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -229,7 +245,7 @@ fun job() {
     nullArgsSelect.entry.add(nullRace)
 
     try {
-        characterWebService.characterWebServicePort.getCharacters(nullArgsSelect)
+        characterWebService.getCharacters(nullArgsSelect)
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
@@ -244,7 +260,7 @@ fun job() {
     notFullInsert.entry.add(notFullInsertRace)
 
     try {
-        characterWebService.characterWebServicePort.createCharacter(notFullInsert)
+        characterWebService.createCharacter(notFullInsert)
     } catch (e: ServiceException_Exception) {
         println("ERROR: " + e.message)
     }
