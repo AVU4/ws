@@ -1,0 +1,39 @@
+services:
+  consul:
+    image: consul:1.15.4
+    hostname: localhost
+    ports:
+      - "8500:8500"
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: student
+      POSTGRES_PASSWORD: ifmo
+      POSTGRES_DB: ws
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+  app:
+    build:
+      context: ../
+      dockerfile: "docker/Dockerfile"
+    environment:
+      - SERVER_PORT=8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      - consul
+      - db
+  second_app:
+    build:
+      context: ../
+      dockerfile: "docker/Dockerfile"
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_PORT=8082
+    depends_on:
+      - consul
+      - db
