@@ -17,3 +17,4 @@
 /lab2/standalone-2/target/
 /lab2/standalone-client-2/target/
 /lab3/standalone-client-3/src/main/java/ifmo/ws/generated/
+/lab7/docker/haproxy.cfg

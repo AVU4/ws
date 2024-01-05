@@ -1,0 +1,9 @@
+FROM haproxy
+
+USER root
+
+RUN apt-get update
+RUN apt-get install -y curl jq
+
+ENTRYPOINT ["/usr/local/bin/generate-haproxy-config.sh"]
+

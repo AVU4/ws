@@ -4,6 +4,19 @@ services:
     hostname: localhost
     ports:
       - "8500:8500"
+  haproxy:
+    build:
+      context: ../
+      dockerfile: "docker/Haproxy-Dockerfile"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./generate-haproxy-config.sh:/usr/local/bin/generate-haproxy-config.sh
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - consul
+      - app
+      - second_app
   db:
     image: postgres:latest
     restart: always
